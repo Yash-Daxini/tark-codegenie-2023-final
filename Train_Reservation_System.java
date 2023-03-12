@@ -24,7 +24,10 @@ class Train {
         this.source = obj.source;
         this.destination = obj.destination;
         this.distanceFromSourceToDestination = obj.distanceFromSourceToDestination;
-        this.coachDetail = obj.coachDetail;
+        this.coachDetail = new HashMap<>();
+        for( String key : obj.coachDetail.keySet() ){
+            this.coachDetail.put( key , obj.coachDetail.get(key) );
+        }
     }
 }
 
@@ -145,8 +148,6 @@ class Train_Reservation_System {
 
         int amount = giveAmountFromCoach(coach);
 
-        // System.out.println("Amount " + amount);
-
         if (coach.equals("SL"))
             coach = "S";
         else if (coach.equals("3A"))
@@ -165,8 +166,6 @@ class Train_Reservation_System {
             for (String route : trainDetailsDateWise.keySet()) {
                 if (route.equalsIgnoreCase(sourceAndDestination)) {
 
-                    // System.out.println("route match");
-
                     for (String coachString : trainDetailsDateWise.get(route).coachDetail.keySet()) {
 
                         String tempcoachString = "";
@@ -180,40 +179,24 @@ class Train_Reservation_System {
                         else if (coachString.charAt(0) == 'H')
                             tempcoachString = "H";
 
-                        // System.out.println(coachString.charAt(0) + " " + coach.charAt(coach.length() - 1) + " " + tempcoachString);
-
-                        // System.out.println(trainDetails.get(route).coachDetail.toString());
                         if( curDate.isEmpty() ){
                             curDate = date;
                         }
                         else if( !curDate.equals(date) ) {
-                            // System.out.println( curDate + " " +  date );
 
                             trainDetailsDateWise = new HashMap<>();
 
-                            // System.out.println( trainDetailsDateWise.toString() );
-
-                            // System.out.println();
-
-                            
                             for( String key : trainDetails.keySet() ){
                                 trainDetailsDateWise.put( key , new Train(trainDetails.get(key)) );
                             }
 
+                            System.out.println( trainDetailsDateWise.get(route).coachDetail.get(coachString) + " "  + coachString );
+
                             curDate = date;   
                         }
 
-                        // System.out.println( trainDetailsDateWise.get(route).coachDetail
-                        // .get(coachString) + " " + totalPassengers + " " + tempcoachString + " " + coach + " " + coachString );
-
-                        // System.out.println( trainDetails.get(route).coachDetail
-                        // .get(coachString) + " " + totalPassengers + " " + tempcoachString + " " + coach + " " + coachString );
-
                         if (tempcoachString.equals(coach) && trainDetailsDateWise.get(route).coachDetail
                         .get(coachString) >= totalPassengers) {
-                            
-
-                            // System.out.println("coach match");
 
                             fair += trainDetailsDateWise.get(route).distanceFromSourceToDestination * amount * totalPassengers;
 
@@ -228,13 +211,8 @@ class Train_Reservation_System {
                                             - totalPassengers);
                             }
 
-
-                            // System.out.println("Amount " + amount);
-
                             break;
 
-                        } else {
-                            continue;
                         }
                     }
                 }
@@ -264,10 +242,6 @@ class Train_Reservation_System {
         trainDetailsDateWise = new HashMap<>();
         
         takeTrainDetails();
-
-        // for( String key : trainDetails.keySet() ){
-        //     trainDetailsDateWise.put( key , trainDetails.get(key) );
-        // }
 
         curDate = "";
 
