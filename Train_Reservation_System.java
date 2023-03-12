@@ -19,6 +19,13 @@ class Train {
         this.distanceFromSourceToDestination = distanceFromSourceToDestination;
         this.coachDetail = coachDetail;
     }
+    Train(Train obj) {
+        this.trainNumber = obj.trainNumber;
+        this.source = obj.source;
+        this.destination = obj.destination;
+        this.distanceFromSourceToDestination = obj.distanceFromSourceToDestination;
+        this.coachDetail = obj.coachDetail;
+    }
 }
 
 // Bookind Details
@@ -44,6 +51,10 @@ class Train_Reservation_System {
     // Store all train details
     static HashMap<String, Train> trainDetails;
 
+    static HashMap<String, Train> trainDetailsDateWise;
+
+    static String curDate;
+
     // Declare PNR
     static long PNR;
 
@@ -63,6 +74,8 @@ class Train_Reservation_System {
 
             HashMap<String, Integer> coachDetailMap = new HashMap<>();
 
+            HashMap<String, Integer> coachDetailMap2 = new HashMap<>();
+
             int trainNumber = Integer.parseInt(trainDetailArray[0]);
 
             String source = trainDetailArray[1].split("-")[0];
@@ -74,15 +87,21 @@ class Train_Reservation_System {
             for (int i = 1; i < coachDetailArray.length; i++) {
                 coachDetailMap.put(coachDetailArray[i].split("-")[0],
                         Integer.parseInt(coachDetailArray[i].split("-")[1]));
+                coachDetailMap2.put(coachDetailArray[i].split("-")[0],
+                        Integer.parseInt(coachDetailArray[i].split("-")[1]));
             }
 
             Train TrainObj = new Train(trainNumber, source, destination, distanceFromSourceToDestination,
                     coachDetailMap);
 
+            Train TrainObj2 = new Train(trainNumber, source, destination, distanceFromSourceToDestination,
+            coachDetailMap2);
+
             String sourceAndDestination = source + " " + destination;
 
             // Store details of the train in the hashmap
             trainDetails.put(sourceAndDestination, TrainObj);
+            trainDetailsDateWise.put( sourceAndDestination , TrainObj2 );
         }
 
     }
@@ -99,11 +118,13 @@ class Train_Reservation_System {
 
         String destination = bookingRequestFromUserArray[1];
 
+        String date = bookingRequestFromUserArray[2];
+
         String coach = bookingRequestFromUserArray[3];
 
         int totalPassenger = Integer.parseInt(bookingRequestFromUserArray[4]);
 
-        checkAndPrintIfSeatsAvailable(source + " " + destination, coach, totalPassenger);
+        checkAndPrintIfSeatsAvailable(source + " " + destination, coach, totalPassenger , date);
 
     }
 
@@ -120,11 +141,11 @@ class Train_Reservation_System {
     }
 
     // Check that ticke is available and if availble then print PNR and fair
-    static void checkAndPrintIfSeatsAvailable(String sourceAndDestination, String coach, int totalPassengers) {
+    static void checkAndPrintIfSeatsAvailable(String sourceAndDestination, String coach, int totalPassengers , String date) {
 
         int amount = giveAmountFromCoach(coach);
 
-        System.out.println("Amount " + amount);
+        // System.out.println("Amount " + amount);
 
         if (coach.equals("SL"))
             coach = "S";
@@ -137,14 +158,16 @@ class Train_Reservation_System {
 
         double fair = 0;
 
-        if (!trainDetails.containsKey(sourceAndDestination)) {
+        if (!trainDetailsDateWise.containsKey(sourceAndDestination)) {
             System.out.println("No Trains Available");
         }
         else {
-            for (String route : trainDetails.keySet()) {
+            for (String route : trainDetailsDateWise.keySet()) {
                 if (route.equalsIgnoreCase(sourceAndDestination)) {
-                    System.out.println("route match");
-                    for (String coachString : trainDetails.get(route).coachDetail.keySet()) {
+
+                    // System.out.println("route match");
+
+                    for (String coachString : trainDetailsDateWise.get(route).coachDetail.keySet()) {
 
                         String tempcoachString = "";
 
@@ -157,22 +180,56 @@ class Train_Reservation_System {
                         else if (coachString.charAt(0) == 'H')
                             tempcoachString = "H";
 
-                        System.out.println(coachString.charAt(0) + " " + coach.charAt(coach.length() - 1) + " " + tempcoachString);
-                        System.out.println(trainDetails.get(route).coachDetail.toString());
+                        // System.out.println(coachString.charAt(0) + " " + coach.charAt(coach.length() - 1) + " " + tempcoachString);
 
-                        if (coachString.charAt(0) == coach.charAt(coach.length() - 1)
-                                && tempcoachString.equals(coach) && trainDetails.get(route).coachDetail
-                                        .get(coachString.charAt(0) + "") >= totalPassengers) {
+                        // System.out.println(trainDetails.get(route).coachDetail.toString());
+                        if( curDate.isEmpty() ){
+                            curDate = date;
+                        }
+                        else if( !curDate.equals(date) ) {
+                            // System.out.println( curDate + " " +  date );
 
-                            System.out.println("coach match");
+                            trainDetailsDateWise = new HashMap<>();
 
-                            fair += trainDetails.get(route).distanceFromSourceToDestination * amount * totalPassengers;
+                            // System.out.println( trainDetailsDateWise.toString() );
 
-                            trainDetails.get(route).coachDetail.put(coachString.charAt(0) + "",
-                                    trainDetails.get(route).coachDetail.get(coachString.charAt(0) + "")
+                            // System.out.println();
+
+                            
+                            for( String key : trainDetails.keySet() ){
+                                trainDetailsDateWise.put( key , new Train(trainDetails.get(key)) );
+                            }
+
+                            curDate = date;   
+                        }
+
+                        // System.out.println( trainDetailsDateWise.get(route).coachDetail
+                        // .get(coachString) + " " + totalPassengers + " " + tempcoachString + " " + coach + " " + coachString );
+
+                        // System.out.println( trainDetails.get(route).coachDetail
+                        // .get(coachString) + " " + totalPassengers + " " + tempcoachString + " " + coach + " " + coachString );
+
+                        if (tempcoachString.equals(coach) && trainDetailsDateWise.get(route).coachDetail
+                        .get(coachString) >= totalPassengers) {
+                            
+
+                            // System.out.println("coach match");
+
+                            fair += trainDetailsDateWise.get(route).distanceFromSourceToDestination * amount * totalPassengers;
+
+                            if( trainDetailsDateWise.get(route).coachDetail.get(coachString)
+                            - totalPassengers <= 0 ){
+                                trainDetailsDateWise.get(route).coachDetail.put(coachString,
+                                    0);
+                            }
+                            else{
+                                trainDetailsDateWise.get(route).coachDetail.put(coachString,
+                                trainDetailsDateWise.get(route).coachDetail.get(coachString)
                                             - totalPassengers);
+                            }
 
-                            System.out.println("Amount " + amount);
+
+                            // System.out.println("Amount " + amount);
 
                             break;
 
@@ -203,8 +260,16 @@ class Train_Reservation_System {
         PNR = 100000001;
 
         trainDetails = new HashMap<>();
-
+        
+        trainDetailsDateWise = new HashMap<>();
+        
         takeTrainDetails();
+
+        // for( String key : trainDetails.keySet() ){
+        //     trainDetailsDateWise.put( key , trainDetails.get(key) );
+        // }
+
+        curDate = "";
 
         while (true) {
 
