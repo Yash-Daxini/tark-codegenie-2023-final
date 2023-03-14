@@ -1,5 +1,8 @@
 Codegenie Upto Milestone - 1
 
+- [x] Milestone-1 Upto level-3 complete
+- [ ] Milestone-1 incomplete
+- [ ] Milestone-2 incomplete
 
 Code is not working in case where need to take some seats from one coach and remaining from another coach.
 
