@@ -88,10 +88,23 @@ class Train_Reservation_System {
             int distanceFromSourceToDestination = Integer.parseInt(trainDetailArray[2].split("-")[1]);
 
             for (int i = 1; i < coachDetailArray.length; i++) {
-                coachDetailMap.put(coachDetailArray[i].split("-")[0],
+                String coach = "";
+                if( coachDetailArray[i].split("-")[0].charAt(0) == 'S' ){
+                    coach = "S";
+                }
+                else if( coachDetailArray[i].split("-")[0].charAt(0) == 'A' ){
+                    coach = "A";
+                }
+                else if( coachDetailArray[i].split("-")[0].charAt(0) == 'B' ){
+                    coach = "B";
+                }
+                else if( coachDetailArray[i].split("-")[0].charAt(0) == 'H' ){
+                    coach = "H";
+                }
+                coachDetailMap.put(coach, coachDetailMap.getOrDefault( coach , 0 ) + 
                         Integer.parseInt(coachDetailArray[i].split("-")[1]));
-                coachDetailMap2.put(coachDetailArray[i].split("-")[0],
-                        Integer.parseInt(coachDetailArray[i].split("-")[1]));
+                coachDetailMap2.put(coach,
+                        Integer.parseInt(coachDetailMap2.getOrDefault( coach , 0 ) + coachDetailArray[i].split("-")[1]));
             }
 
             Train TrainObj = new Train(trainNumber, source, destination, distanceFromSourceToDestination,
