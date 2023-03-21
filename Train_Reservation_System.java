@@ -49,12 +49,30 @@ class BookingRequests {
 
 }
 
+//Store and track the seats according to specific date
+class DateWiseCoachAndSits{
+    String date;
+    int seatsAvailbaleInS;
+    int seatsAvailbaleInA;
+    int seatsAvailbaleInB;
+    int seatsAvailbaleInH;
+
+    DateWiseCoachAndSits( String date , int seatsAvailbaleInS , int seatsAvailbaleInA , int seatsAvailbaleInB , int seatsAvailbaleInH ){
+        this.date = date;
+        this.seatsAvailbaleInS = seatsAvailbaleInS;
+        this.seatsAvailbaleInA = seatsAvailbaleInA;
+        this.seatsAvailbaleInB = seatsAvailbaleInB;
+        this.seatsAvailbaleInH = seatsAvailbaleInH;
+    }
+}
+
+//Main Class
 class Train_Reservation_System {
 
     // Store all train details
     static HashMap<String, Train> trainDetails;
 
-    static HashMap<String, Train> trainDetailsDateWise;
+    static HashMap<String, DateWiseCoachAndSits> dateWiseCoachAndSeats;
 
     static String curDate;
 
@@ -110,14 +128,12 @@ class Train_Reservation_System {
             Train TrainObj = new Train(trainNumber, source, destination, distanceFromSourceToDestination,
                     coachDetailMap);
 
-            Train TrainObj2 = new Train(trainNumber, source, destination, distanceFromSourceToDestination,
-            coachDetailMap2);
-
             String sourceAndDestination = source + " " + destination;
 
             // Store details of the train in the hashmap
             trainDetails.put(sourceAndDestination, TrainObj);
-            trainDetailsDateWise.put( sourceAndDestination , TrainObj2 );
+
+            
         }
 
     }
@@ -145,7 +161,6 @@ class Train_Reservation_System {
     }
 
     // Give amount per km
-
     static int giveAmountFromCoach(String coach) {
         if (coach.equals("SL"))
             return 1;
@@ -172,14 +187,14 @@ class Train_Reservation_System {
 
         double fair = 0;
 
-        if (!trainDetailsDateWise.containsKey(sourceAndDestination)) {
+        if (!trainDetails.containsKey(sourceAndDestination)) {
             System.out.println("No Trains Available");
         }
         else {
-            for (String route : trainDetailsDateWise.keySet()) {
+            for (String route : trainDetails.keySet()) {
                 if (route.equalsIgnoreCase(sourceAndDestination)) {
 
-                    for (String coachString : trainDetailsDateWise.get(route).coachDetail.keySet()) {
+                    for (String coachString : trainDetails.get(route).coachDetail.keySet()) {
 
                         String tempcoachString = "";
 
@@ -192,42 +207,83 @@ class Train_Reservation_System {
                         else if (coachString.charAt(0) == 'H')
                             tempcoachString = "H";
 
-                        if( curDate.isEmpty() ){
-                            curDate = date;
-                        }
-                        else if( !curDate.equals(date) ) {
+                        if( !dateWiseCoachAndSeats.containsKey(date) ){
 
-                            trainDetailsDateWise = new HashMap<>();
+                            // System.out.println( trainDetails.toString() );
 
-                            for( String key : trainDetails.keySet() ){
-                                trainDetailsDateWise.put( key , new Train(trainDetails.get(key)) );
-                            }
+                            DateWiseCoachAndSits dateObj = new DateWiseCoachAndSits(date,trainDetails.get(route).coachDetail.getOrDefault("S",0),trainDetails.get(route).coachDetail.getOrDefault("A",0),trainDetails.get(route).coachDetail.getOrDefault("B",0),trainDetails.get(route).coachDetail.getOrDefault("H",0));
 
-                            // System.out.println( trainDetailsDateWise.get(route).coachDetail.get(coachString) + " "  + coachString );
+                            dateWiseCoachAndSeats.put( date , dateObj );
 
-                            curDate = date;   
                         }
 
-                        if (tempcoachString.equals(coach) && trainDetailsDateWise.get(route).coachDetail
-                        .get(coachString) >= totalPassengers) {
+                        if (tempcoachString.equals(coach) && coach.equals("S") && dateWiseCoachAndSeats.get(date).seatsAvailbaleInS >= totalPassengers) {
 
-                            fair += trainDetailsDateWise.get(route).distanceFromSourceToDestination * amount * totalPassengers;
+                            fair += trainDetails.get(route).distanceFromSourceToDestination * amount * totalPassengers;
 
-                            if( trainDetailsDateWise.get(route).coachDetail.get(coachString)
+                            if( dateWiseCoachAndSeats.get(date).seatsAvailbaleInS
                             - totalPassengers <= 0 ){
-                                trainDetailsDateWise.get(route).coachDetail.put(coachString,
-                                    0);
+                                dateWiseCoachAndSeats.get(date).seatsAvailbaleInS = 0;
                             }
                             else{
-                                trainDetailsDateWise.get(route).coachDetail.put(coachString,
-                                trainDetailsDateWise.get(route).coachDetail.get(coachString)
-                                            - totalPassengers);
+                                dateWiseCoachAndSeats.get(date).seatsAvailbaleInS -= totalPassengers;
                             }
 
                             break;
 
                         }
+                     
+                        else if (tempcoachString.equals(coach) && coach.equals("A") && dateWiseCoachAndSeats.get(date).
+                        seatsAvailbaleInA >= totalPassengers) {
+
+                            fair += trainDetails.get(route).distanceFromSourceToDestination * amount * totalPassengers;
+
+                            if( dateWiseCoachAndSeats.get(date).seatsAvailbaleInA
+                            - totalPassengers <= 0 ){
+                                dateWiseCoachAndSeats.get(date).seatsAvailbaleInA = 0;
+                            }
+                            else{
+                                dateWiseCoachAndSeats.get(date).seatsAvailbaleInA -= totalPassengers;
+                            }
+
+                            break;
+
+                        }
+
+                        else if (tempcoachString.equals(coach) && coach.equals("B") && dateWiseCoachAndSeats.get(date).seatsAvailbaleInB >= totalPassengers) {
+
+                            fair += trainDetails.get(route).distanceFromSourceToDestination * amount * totalPassengers;
+
+                            if( dateWiseCoachAndSeats.get(date).seatsAvailbaleInB
+                            - totalPassengers <= 0 ){
+                                dateWiseCoachAndSeats.get(date).seatsAvailbaleInB = 0;
+                            }
+                            else{
+                                dateWiseCoachAndSeats.get(date).seatsAvailbaleInB -= totalPassengers;
+                            }
+
+                            break;
+
+                        }
+
+                        else if (tempcoachString.equals(coach) && coach.equals("H") && dateWiseCoachAndSeats.get(date).seatsAvailbaleInH >= totalPassengers) {
+
+                            fair += trainDetails.get(route).distanceFromSourceToDestination * amount * totalPassengers;
+
+                            if( dateWiseCoachAndSeats.get(date).seatsAvailbaleInS
+                            - totalPassengers <= 0 ){
+                                dateWiseCoachAndSeats.get(date).seatsAvailbaleInH = 0;
+                            }
+                            else{
+                                dateWiseCoachAndSeats.get(date).seatsAvailbaleInH -= totalPassengers;
+                            }
+
+                            break;
+
+                        }
+
                     }
+
                 }
 
                 if (fair != 0) {
@@ -252,7 +308,7 @@ class Train_Reservation_System {
 
         trainDetails = new HashMap<>();
         
-        trainDetailsDateWise = new HashMap<>();
+        dateWiseCoachAndSeats = new HashMap<>();
         
         takeTrainDetails();
 
