@@ -52,13 +52,15 @@ class BookingRequests {
 //Store and track the seats according to specific date
 class DateWiseCoachAndSits{
     String date;
+    String route;
     int seatsAvailbaleInS;
     int seatsAvailbaleInA;
     int seatsAvailbaleInB;
     int seatsAvailbaleInH;
 
-    DateWiseCoachAndSits( String date , int seatsAvailbaleInS , int seatsAvailbaleInA , int seatsAvailbaleInB , int seatsAvailbaleInH ){
+    DateWiseCoachAndSits( String date , String route , int seatsAvailbaleInS , int seatsAvailbaleInA , int seatsAvailbaleInB , int seatsAvailbaleInH ){
         this.date = date;
+        this.route = route;
         this.seatsAvailbaleInS = seatsAvailbaleInS;
         this.seatsAvailbaleInA = seatsAvailbaleInA;
         this.seatsAvailbaleInB = seatsAvailbaleInB;
@@ -207,75 +209,79 @@ class Train_Reservation_System {
                         else if (coachString.charAt(0) == 'H')
                             tempcoachString = "H";
 
-                        if( !dateWiseCoachAndSeats.containsKey(date) ){
+                        if( !dateWiseCoachAndSeats.containsKey(date + " " + route) ){
 
                             // System.out.println( trainDetails.toString() );
 
-                            DateWiseCoachAndSits dateObj = new DateWiseCoachAndSits(date,trainDetails.get(route).coachDetail.getOrDefault("S",0),trainDetails.get(route).coachDetail.getOrDefault("A",0),trainDetails.get(route).coachDetail.getOrDefault("B",0),trainDetails.get(route).coachDetail.getOrDefault("H",0));
+                            DateWiseCoachAndSits dateObj = new DateWiseCoachAndSits(date,route,trainDetails.get(route).coachDetail.getOrDefault("S",0),trainDetails.get(route).coachDetail.getOrDefault("A",0),trainDetails.get(route).coachDetail.getOrDefault("B",0),trainDetails.get(route).coachDetail.getOrDefault("H",0));
 
-                            dateWiseCoachAndSeats.put( date , dateObj );
+                            dateWiseCoachAndSeats.put( date + " " + route , dateObj );
 
                         }
 
-                        if (tempcoachString.equals(coach) && coach.equals("S") && dateWiseCoachAndSeats.get(date).seatsAvailbaleInS >= totalPassengers) {
+                        // for( String key : dateWiseCoachAndSeats.keySet() ){
+                        //     System.out.println( key + " " + dateWiseCoachAndSeats.get(key).toString() );
+                        // }
+
+                        if (tempcoachString.equals(coach) && coach.equals("S") && dateWiseCoachAndSeats.get(date + " " + route).seatsAvailbaleInS >= totalPassengers) {
 
                             fair += trainDetails.get(route).distanceFromSourceToDestination * amount * totalPassengers;
 
-                            if( dateWiseCoachAndSeats.get(date).seatsAvailbaleInS
+                            if( dateWiseCoachAndSeats.get(date + " " + route).seatsAvailbaleInS
                             - totalPassengers <= 0 ){
-                                dateWiseCoachAndSeats.get(date).seatsAvailbaleInS = 0;
+                                dateWiseCoachAndSeats.get(date + " " + route).seatsAvailbaleInS = 0;
                             }
                             else{
-                                dateWiseCoachAndSeats.get(date).seatsAvailbaleInS -= totalPassengers;
+                                dateWiseCoachAndSeats.get(date + " " + route).seatsAvailbaleInS -= totalPassengers;
                             }
 
                             break;
 
                         }
                      
-                        else if (tempcoachString.equals(coach) && coach.equals("A") && dateWiseCoachAndSeats.get(date).
+                        else if (tempcoachString.equals(coach) && coach.equals("A") && dateWiseCoachAndSeats.get(date + " " + route).
                         seatsAvailbaleInA >= totalPassengers) {
 
                             fair += trainDetails.get(route).distanceFromSourceToDestination * amount * totalPassengers;
 
-                            if( dateWiseCoachAndSeats.get(date).seatsAvailbaleInA
+                            if( dateWiseCoachAndSeats.get(date + " " + route).seatsAvailbaleInA
                             - totalPassengers <= 0 ){
-                                dateWiseCoachAndSeats.get(date).seatsAvailbaleInA = 0;
+                                dateWiseCoachAndSeats.get(date + " " + route).seatsAvailbaleInA = 0;
                             }
                             else{
-                                dateWiseCoachAndSeats.get(date).seatsAvailbaleInA -= totalPassengers;
+                                dateWiseCoachAndSeats.get(date + " " + route).seatsAvailbaleInA -= totalPassengers;
                             }
 
                             break;
 
                         }
 
-                        else if (tempcoachString.equals(coach) && coach.equals("B") && dateWiseCoachAndSeats.get(date).seatsAvailbaleInB >= totalPassengers) {
+                        else if (tempcoachString.equals(coach) && coach.equals("B") && dateWiseCoachAndSeats.get(date + " " + route).seatsAvailbaleInB >= totalPassengers) {
 
                             fair += trainDetails.get(route).distanceFromSourceToDestination * amount * totalPassengers;
 
-                            if( dateWiseCoachAndSeats.get(date).seatsAvailbaleInB
+                            if( dateWiseCoachAndSeats.get(date + " " + route).seatsAvailbaleInB
                             - totalPassengers <= 0 ){
-                                dateWiseCoachAndSeats.get(date).seatsAvailbaleInB = 0;
+                                dateWiseCoachAndSeats.get(date + " " + route).seatsAvailbaleInB = 0;
                             }
                             else{
-                                dateWiseCoachAndSeats.get(date).seatsAvailbaleInB -= totalPassengers;
+                                dateWiseCoachAndSeats.get(date + " " + route).seatsAvailbaleInB -= totalPassengers;
                             }
 
                             break;
 
                         }
 
-                        else if (tempcoachString.equals(coach) && coach.equals("H") && dateWiseCoachAndSeats.get(date).seatsAvailbaleInH >= totalPassengers) {
+                        else if (tempcoachString.equals(coach) && coach.equals("H") && dateWiseCoachAndSeats.get(date + " " + route).seatsAvailbaleInH >= totalPassengers) {
 
                             fair += trainDetails.get(route).distanceFromSourceToDestination * amount * totalPassengers;
 
-                            if( dateWiseCoachAndSeats.get(date).seatsAvailbaleInS
+                            if( dateWiseCoachAndSeats.get(date + " " + route).seatsAvailbaleInS
                             - totalPassengers <= 0 ){
-                                dateWiseCoachAndSeats.get(date).seatsAvailbaleInH = 0;
+                                dateWiseCoachAndSeats.get(date + " " + route).seatsAvailbaleInH = 0;
                             }
                             else{
-                                dateWiseCoachAndSeats.get(date).seatsAvailbaleInH -= totalPassengers;
+                                dateWiseCoachAndSeats.get(date + " " + route).seatsAvailbaleInH -= totalPassengers;
                             }
 
                             break;
