@@ -1,5 +1,6 @@
 import java.util.*;
 
+//Task class which contains all details of class
 class Task {
     String taskName;
     int time;
@@ -17,10 +18,16 @@ class Task {
 
 }
 
+//Function which contains main method
 class CompletionTimeOfTask {
+
+    //List to store all tasks
     static List<Task> tasks = new ArrayList<>();
+
+    //Hashmap to store taskname and it's total completion time
     static HashMap<String, Integer> taskAndCompetionTime = new HashMap<>();
 
+    //Give whole task object from taskname
     static Task giveTaskObjFromName(String name) {
         for (Task task : tasks) {
             if (task.taskName.equals(name))
@@ -29,6 +36,7 @@ class CompletionTimeOfTask {
         return null;
     }
 
+    //Take input
     static void takeInput() {
         Scanner sc = new Scanner(System.in);
         System.out.print("Enter number of tasks:");
@@ -53,28 +61,22 @@ class CompletionTimeOfTask {
         }
     }
 
+    //Compute completion time according to dependancy
     static int computeCompletionTimeForGivenTask(Task task, int max) {
-        System.out.println("Call for the " + task.taskName);
         for (String dependency : task.dependancy) {
             Task tempObj = giveTaskObjFromName(dependency);
-            System.out.println("Call for the " + task.taskName + " dependancy on " + tempObj.taskName);
             if (!taskAndCompetionTime.containsKey(dependency)) {
                 callForCompute(tempObj);
-                max = Math.max(tempObj.time, computeCompletionTimeForGivenTask(tempObj, max));
-            } else {
-                max = Math.max(taskAndCompetionTime.get(tempObj.taskName), max);
             }
+            max = Math.max(taskAndCompetionTime.get(tempObj.taskName), max);
         }
         return max;
     }
 
+    //Call compute function and store value in hashmap
     static void callForCompute(Task task) {
-        if (taskAndCompetionTime.containsKey(task.taskName)) {
-            return;
-        } else {
-            int x = computeCompletionTimeForGivenTask(task, 0);
-            taskAndCompetionTime.put(task.taskName, x + task.time);
-        }
+        int x = computeCompletionTimeForGivenTask(task, 0);
+        taskAndCompetionTime.put(task.taskName, x + task.time);
     }
 
     public static void main(String[] args) {
@@ -82,12 +84,12 @@ class CompletionTimeOfTask {
         takeInput();
 
         for (Task task : tasks) {
-            callForCompute(task);
+            if (!taskAndCompetionTime.containsKey(task))
+                callForCompute(task);
         }
 
-        System.out.println(taskAndCompetionTime);
-        int totalTimeToCompletetTasks = !taskAndCompetionTime.isEmpty() ? Collections.max(taskAndCompetionTime.values())
-                : 0;
+        int totalTimeToCompletetTasks = !taskAndCompetionTime.isEmpty() ? Collections.max(taskAndCompetionTime.values()) : 0;
+
         System.out.println("Time to complete all the task : " + totalTimeToCompletetTasks);
     }
 }
